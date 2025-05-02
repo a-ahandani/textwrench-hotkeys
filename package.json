@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Windows-only Go binary that handles Textwrench hotkeys via named pipe",
   "main": "index.js",
-  "os": ["win32"],
   "files": ["textwrench-hotkeys.exe", "index.js"],
   "bin": {
     "textwrench-hotkeys": "./textwrench-hotkeys.exe"
