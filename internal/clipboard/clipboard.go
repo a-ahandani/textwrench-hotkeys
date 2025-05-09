@@ -1,11 +1,15 @@
 package clipboard
 
-// ReadSelectedText triggers Cmd/Ctrl+C and returns selected clipboard text.
+import (
+	"fmt"
+	"time"
+)
+
 func ReadSelectedText() (string, error) {
+	fmt.Println("Reading selected text at", time.Now().Format(time.RFC3339))
 	return readSelectedText()
 }
 
-// WriteText writes the given text to the clipboard and triggers paste (Cmd/Ctrl+V).
 func WriteText(text string) error {
 	return writeText(text)
 }
