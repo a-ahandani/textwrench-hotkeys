@@ -1,10 +1,11 @@
 {
   "name": "textwrench-hotkeys",
-  "version": "1.1.0",
-  "description": "Windows-only Go binary that handles Textwrench hotkeys via named pipe",
+  "version": "1.1.1",
+  "description": "Cross-platform Go binary that handles Textwrench hotkeys via IPC",
   "main": "index.js",
-  "files": ["textwrench-hotkeys.exe", "index.js"],
-  "bin": {
-    "textwrench-hotkeys": "./textwrench-hotkeys.exe"
-  }
+  "files": [
+    "textwrench-hotkeys.exe",
+    "textwrench-hotkeys-macos",
+    "index.js"
+  ]
 }

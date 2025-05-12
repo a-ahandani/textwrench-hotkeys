@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
@@ -30,14 +30,19 @@ jobs:
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: 🧰 Build Go executable for Windows
-        run: go build -o textwrench-hotkeys.exe ./cmd/app
+        run: GOOS=windows GOARCH=amd64 go build -o textwrench-hotkeys.exe ./cmd/app
+
+      - name: 🧰 Build Go executable for macOS
+        run: GOOS=darwin GOARCH=amd64 go build -o textwrench-hotkeys-macos ./cmd/app
 
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
-          files: textwrench-hotkeys.exe
+          files: |
+            textwrench-hotkeys.exe
+            textwrench-hotkeys-macos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
