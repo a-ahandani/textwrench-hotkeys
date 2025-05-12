@@ -13,6 +13,8 @@ import (
 	"textwrench-hotkeys/internal/comms"
 	"textwrench-hotkeys/internal/hotkey"
 	"time"
+
+	hk "golang.design/x/hotkey"
 )
 
 type ShortcutConfig struct {
@@ -121,19 +123,18 @@ func handleConfigMessage(message string, comm comms.Communicator, manager *hotke
 	registerHotkeys(ctx, manager, comm, configs)
 }
 
-func parseModifiers(mods []string) []hotkey.Modifier {
-	var result []hotkey.Modifier
+func parseModifiers(mods []string) []hk.Modifier {
+	var result []hk.Modifier
 	for _, mod := range mods {
 		switch strings.ToLower(mod) {
 		case "ctrl":
-			result = append(result, hotkey.ModCtrl)
+			result = append(result, hk.ModCtrl)
 		case "shift":
-			result = append(result, hotkey.ModShift)
-		case "alt", "option":
-			result = append(result, hotkey.ModShift) // fallback, adjust if you define `ModAlt`
+			result = append(result, hk.ModShift)
 		case "cmd", "meta":
-			result = append(result, hotkey.ModCmd)
+			result = append(result, hk.ModCtrl)
 		}
+
 	}
 	return result
 }
