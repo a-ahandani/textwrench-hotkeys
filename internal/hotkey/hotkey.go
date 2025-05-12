@@ -13,10 +13,6 @@ type Modifier = hotkey.Modifier
 type Key = hotkey.Key
 
 const (
-	ModCtrl  = hotkey.ModCtrl
-	ModShift = hotkey.ModShift
-	ModCmd   = hotkey.ModCmd
-
 	KeyA = hotkey.KeyA
 	KeyB = hotkey.KeyB
 	KeyC = hotkey.KeyC

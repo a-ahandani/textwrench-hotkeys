@@ -13,8 +13,6 @@ import (
 	"textwrench-hotkeys/internal/comms"
 	"textwrench-hotkeys/internal/hotkey"
 	"time"
-
-	hk "golang.design/x/hotkey"
 )
 
 type ShortcutConfig struct {
@@ -49,7 +47,6 @@ func run() {
 		{ID: "selectPrompt", Key: "J", Modifiers: []string{"ctrl", "shift"}},
 	}
 
-	// Register the default hotkeys
 	registerHotkeys(ctx, manager, comm, defaultHotkeys)
 
 	handler := func(message string) {
@@ -122,21 +119,20 @@ func handleConfigMessage(message string, comm comms.Communicator, manager *hotke
 	fmt.Println("Registering hotkey:", message)
 
 	registerHotkeys(ctx, manager, comm, configs)
-
 }
 
-func parseModifiers(mods []string) []hk.Modifier {
-	var result []hk.Modifier
+func parseModifiers(mods []string) []hotkey.Modifier {
+	var result []hotkey.Modifier
 	for _, mod := range mods {
 		switch strings.ToLower(mod) {
 		case "ctrl":
-			result = append(result, hk.ModCtrl)
+			result = append(result, hotkey.ModCtrl)
 		case "shift":
-			result = append(result, hk.ModShift)
-		case "alt":
-			result = append(result, hk.ModOption)
+			result = append(result, hotkey.ModShift)
+		case "alt", "option":
+			result = append(result, hotkey.ModShift) // fallback, adjust if you define `ModAlt`
 		case "cmd", "meta":
-			result = append(result, hk.ModCmd)
+			result = append(result, hotkey.ModCmd)
 		}
 	}
 	return result
@@ -145,58 +141,58 @@ func parseModifiers(mods []string) []hk.Modifier {
 func parseKey(k string) hotkey.Key {
 	switch strings.ToUpper(k) {
 	case "A":
-		return hk.KeyA
+		return hotkey.KeyA
 	case "B":
-		return hk.KeyB
+		return hotkey.KeyB
 	case "C":
-		return hk.KeyC
+		return hotkey.KeyC
 	case "D":
-		return hk.KeyD
+		return hotkey.KeyD
 	case "E":
-		return hk.KeyE
+		return hotkey.KeyE
 	case "F":
-		return hk.KeyF
+		return hotkey.KeyF
 	case "G":
-		return hk.KeyG
+		return hotkey.KeyG
 	case "H":
-		return hk.KeyH
+		return hotkey.KeyH
 	case "I":
-		return hk.KeyI
+		return hotkey.KeyI
 	case "J":
-		return hk.KeyJ
+		return hotkey.KeyJ
 	case "K":
-		return hk.KeyK
+		return hotkey.KeyK
 	case "L":
-		return hk.KeyL
+		return hotkey.KeyL
 	case "M":
-		return hk.KeyM
+		return hotkey.KeyM
 	case "N":
-		return hk.KeyN
+		return hotkey.KeyN
 	case "O":
-		return hk.KeyO
+		return hotkey.KeyO
 	case "P":
-		return hk.KeyP
+		return hotkey.KeyP
 	case "Q":
-		return hk.KeyQ
+		return hotkey.KeyQ
 	case "R":
-		return hk.KeyR
+		return hotkey.KeyR
 	case "S":
-		return hk.KeyS
+		return hotkey.KeyS
 	case "T":
-		return hk.KeyT
+		return hotkey.KeyT
 	case "U":
-		return hk.KeyU
+		return hotkey.KeyU
 	case "V":
-		return hk.KeyV
+		return hotkey.KeyV
 	case "W":
-		return hk.KeyW
+		return hotkey.KeyW
 	case "X":
-		return hk.KeyX
+		return hotkey.KeyX
 	case "Y":
-		return hk.KeyY
+		return hotkey.KeyY
 	case "Z":
-		return hk.KeyZ
+		return hotkey.KeyZ
 	default:
-		return hk.KeyC
+		return hotkey.KeyC
 	}
 }
