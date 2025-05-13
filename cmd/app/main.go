@@ -95,7 +95,7 @@ func registerHotkeys(ctx context.Context, manager *hotkey.Manager, comm comms.Co
 	for _, cfg := range hotkeys {
 		id := cfg.ID
 		key := parseKey(cfg.Key)
-		mods := parseModifiers(cfg.Modifiers)
+		mods := convertModifiers(parseModifiers(cfg.Modifiers))
 
 		action := func() {
 			text, err := clipboard.ReadSelectedText()
@@ -137,6 +137,14 @@ func parseModifiers(mods []string) []hk.Modifier {
 
 	}
 	return result
+}
+
+func convertModifiers(mods []hk.Modifier) []hotkey.Modifier {
+	var converted []hotkey.Modifier
+	for _, mod := range mods {
+		converted = append(converted, hotkey.Modifier(mod))
+	}
+	return converted
 }
 
 func parseKey(k string) hotkey.Key {
