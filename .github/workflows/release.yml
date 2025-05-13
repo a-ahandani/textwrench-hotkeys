@@ -33,7 +33,7 @@ jobs:
         run: GOOS=windows GOARCH=amd64 go build -o textwrench-hotkeys.exe ./cmd/app
 
       - name: 🧰 Build Go executable for macOS
-        run: GOOS=darwin GOARCH=amd64 go build -o textwrench-hotkeys-macos ./cmd/app
+        run: GOOS=darwin go build -o textwrench-hotkeys-macos ./cmd/app
 
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
