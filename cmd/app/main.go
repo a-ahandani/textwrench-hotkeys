@@ -95,7 +95,7 @@ func registerHotkeys(ctx context.Context, manager *hotkey.Manager, comm comms.Co
 	for _, cfg := range hotkeys {
 		id := cfg.ID
 		key := parseKey(cfg.Key)
-		mods := convertModifiers(parseModifiers(cfg.Modifiers))
+		mods := hotkey.ParseModifiers(cfg.Modifiers)
 
 		action := func() {
 			text, err := clipboard.ReadSelectedText()
@@ -121,22 +121,6 @@ func handleConfigMessage(message string, comm comms.Communicator, manager *hotke
 	fmt.Println("Registering hotkey:", message)
 
 	registerHotkeys(ctx, manager, comm, configs)
-}
-
-func parseModifiers(mods []string) []hk.Modifier {
-	var result []hk.Modifier
-	for _, mod := range mods {
-		switch strings.ToLower(mod) {
-		case "ctrl":
-			result = append(result, hk.ModCtrl)
-		case "shift":
-			result = append(result, hk.ModShift)
-		case "cmd", "meta":
-			result = append(result, hk.ModCtrl)
-		}
-
-	}
-	return result
 }
 
 func convertModifiers(mods []hk.Modifier) []hotkey.Modifier {

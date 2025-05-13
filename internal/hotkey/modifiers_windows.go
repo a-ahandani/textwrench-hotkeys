@@ -5,9 +5,11 @@ package hotkey
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"golang.design/x/hotkey"
+	hk "golang.design/x/hotkey"
 	"golang.design/x/hotkey/mainthread"
 )
 
@@ -106,4 +108,20 @@ func (m *Manager) UnregisterAll() {
 		hk.cancel()
 		delete(m.registry, id)
 	}
+}
+
+// ParseModifiers maps strings like "ctrl", "shift", "cmd" to Windows-specific modifiers
+func ParseModifiers(mods []string) []Modifier {
+	var result []Modifier
+	for _, mod := range mods {
+		switch strings.ToLower(mod) {
+		case "ctrl":
+			result = append(result, Modifier(hk.ModCtrl))
+		case "shift":
+			result = append(result, Modifier(hk.ModShift))
+		case "cmd", "meta":
+			result = append(result, Modifier(hk.ModCtrl)) // Treat as Ctrl on Windows
+		}
+	}
+	return result
 }

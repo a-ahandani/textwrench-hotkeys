@@ -5,6 +5,7 @@ package hotkey
 import (
 	"context"
 	"errors"
+	"strings"
 )
 
 type Modifier int
@@ -55,3 +56,18 @@ func (m *Manager) RegisterHotkey(ctx context.Context, id string, mods []Modifier
 }
 
 func (m *Manager) UnregisterAll() {}
+
+func ParseModifiers(mods []string) []Modifier {
+	var result []Modifier
+	for _, mod := range mods {
+		switch strings.ToLower(mod) {
+		case "ctrl":
+			result = append(result, Modifier(1))
+		case "shift":
+			result = append(result, Modifier(2))
+		case "cmd", "meta":
+			result = append(result, Modifier(3))
+		}
+	}
+	return result
+}
