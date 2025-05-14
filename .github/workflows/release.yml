@@ -24,13 +24,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: 🔼 Bump npm version (patch)
-        run: npm version patch --no-git-tag-version
+        run: |
+          npm version patch --no-git-tag-version
+          VERSION=$(node -p 'require("./package.json").version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: 💾 Store new version
         id: version
         run: |
-          VERSION=$(node -p 'require("./package.json").version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
 
       - name: 📤 Upload updated package.json
         uses: actions/upload-artifact@v4
