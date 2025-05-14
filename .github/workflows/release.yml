@@ -97,8 +97,8 @@ jobs:
       - name: 📁 Prepare dist folder for npm
         run: |
           mkdir -p dist
-          cp artifacts/textwrench-hotkeys.exe dist/
-          cp artifacts/textwrench-hotkeys-macos dist/
+          cp artifacts/*/textwrench-hotkeys.exe dist/
+          cp artifacts/*/textwrench-hotkeys-macos dist/
 
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
