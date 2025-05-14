@@ -13,7 +13,7 @@ jobs:
   version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      version: ${{ steps.set-version.outputs.version }}
     steps:
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
@@ -26,15 +26,12 @@ jobs:
       - name: 🔼 Bump npm version (patch)
         run: |
           npm version patch --no-git-tag-version
-          VERSION=$(node -p 'require("./package.json").version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: 💾 Store new version
-        id: version
-        run: |
-          echo "version=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
+      - name: 💾 Get and output new version
+        id: set-version
+        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
 
-      - name: 📤 Upload updated package.json
+      - name: 📤 Upload versioned package.json and lock file
         uses: actions/upload-artifact@v4
         with:
           name: versioned-package
@@ -89,46 +86,19 @@ jobs:
       id-token: write
 
     steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
       - name: 📥 Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
 
-      - name: 📥 Checkout repo
-        uses: actions/checkout@v4
-
-      - name: 📥 Restore versioned package.json
-        uses: actions/download-artifact@v4
-        with:
-          name: versioned-package
-          path: .
-
-      - name: 📂 Copy binaries to package directory
+      - name: 📁 Prepare dist folder for npm
         run: |
           mkdir -p dist
-          cp artifacts/textwrench-hotkeys.exe/textwrench-hotkeys.exe dist/
-          cp artifacts/textwrench-hotkeys-macos/textwrench-hotkeys-macos dist/
-
-      - name: 📝 Update package.json to include binaries
-        run: |
-          node -e '
-            const fs = require("fs");
-            const pkg = require("./package.json");
-            pkg.files = pkg.files || [];
-            if (!pkg.files.includes("dist")) pkg.files.push("dist");
-            fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
-          '
-
-      - name: 🔐 Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: 📤 Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          cp artifacts/textwrench-hotkeys.exe dist/
+          cp artifacts/textwrench-hotkeys-macos dist/
 
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
@@ -141,11 +111,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📌 Commit and push updated package.json
+      - name: 📥 Restore versioned package.json
+        uses: actions/download-artifact@v4
+        with:
+          name: versioned-package
+          path: .
+
+      - name: 🔐 Set up Node.js for npm publish
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 📤 Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: 📌 Commit and push updated version and tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add package.json
+          git add package.json package-lock.json
           git commit -m "chore: release v${{ needs.version.outputs.version }}"
           git tag v${{ needs.version.outputs.version }}
           git push origin main --follow-tags
