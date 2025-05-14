@@ -94,26 +94,30 @@ jobs:
         with:
           path: ./artifacts
 
-      # Ensure the repository is checked out again in the release step
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
-
-      - name: 📦 Publish GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ needs.version.outputs.version }}
-          name: v${{ needs.version.outputs.version }}
-          files: |
-            artifacts/textwrench-hotkeys.exe/textwrench-hotkeys.exe
-            artifacts/textwrench-hotkeys-macos/textwrench-hotkeys-macos
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📥 Restore versioned package.json
         uses: actions/download-artifact@v4
         with:
           name: versioned-package
           path: .
+
+      - name: 📂 Copy binaries to package directory
+        run: |
+          mkdir -p dist
+          cp artifacts/textwrench-hotkeys.exe/textwrench-hotkeys.exe dist/
+          cp artifacts/textwrench-hotkeys-macos/textwrench-hotkeys-macos dist/
+
+      - name: 📝 Update package.json to include binaries
+        run: |
+          node -e '
+            const fs = require("fs");
+            const pkg = require("./package.json");
+            pkg.files = pkg.files || [];
+            if (!pkg.files.includes("dist")) pkg.files.push("dist");
+            fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
+          '
 
       - name: 🔐 Set up Node.js
         uses: actions/setup-node@v4
@@ -125,6 +129,17 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: 📦 Publish GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.version.outputs.version }}
+          name: v${{ needs.version.outputs.version }}
+          files: |
+            dist/textwrench-hotkeys.exe
+            dist/textwrench-hotkeys-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📌 Commit and push updated package.json
         run: |
