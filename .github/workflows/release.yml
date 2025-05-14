@@ -94,6 +94,10 @@ jobs:
         with:
           path: ./artifacts
 
+      # Ensure the repository is checked out again in the release step
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
