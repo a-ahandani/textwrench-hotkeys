@@ -6,6 +6,7 @@
   "files": [
     "textwrench-hotkeys.exe",
     "textwrench-hotkeys-macos",
-    "index.js"
+    "index.js",
+    "dist/"
   ]
 }
