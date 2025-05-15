@@ -117,19 +117,21 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 📌 Commit and push updated version and tag
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add package.json
-          git commit -m "chore: release v${{ env.NODE_VERSION }}"
-          git tag v${{ env.NODE_VERSION }}
+          git commit -m "chore: release v$VERSION"
+          git tag v$VERSION
           git push origin main --follow-tags
           
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.NODE_VERSION }}
-          name: v${{ env.NODE_VERSION }}
+          tag_name: v${{ needs.version.outputs.version }}
+          name: v${{ needs.version.outputs.version }}
           files: |
             textwrench-hotkeys.exe
             textwrench-hotkeys-macos
