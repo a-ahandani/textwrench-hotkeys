@@ -94,12 +94,10 @@ jobs:
         with:
           path: ./artifacts
 
-      - name: 📁 Prepare dist folder for npm
+      - name: 📁 Prepare files for npm
         run: |
           ls -la artifacts
-          mkdir -p dist
-          find artifacts -type f -name 'textwrench-hotkeys*' -exec cp {} dist/ \;
-          ls -la dist
+          find artifacts -type f -name 'textwrench-hotkeys*' -exec cp {} ./ \;
 
       - name: 📥 Restore versioned package.json
         uses: actions/download-artifact@v4
@@ -133,7 +131,7 @@ jobs:
           tag_name: v${{ needs.version.outputs.version }}
           name: v${{ needs.version.outputs.version }}
           files: |
-            dist/textwrench-hotkeys.exe
-            dist/textwrench-hotkeys-macos
+            textwrench-hotkeys.exe
+            textwrench-hotkeys-macos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
