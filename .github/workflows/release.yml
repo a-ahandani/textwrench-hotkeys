@@ -28,12 +28,8 @@ jobs:
           npm version patch --no-git-tag-version
 
       - name: 💾 Get and output new version
-        id: set-version
-        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
-      
-      - name: 💾 Store new version
         id: version
-        run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
 
       - name: 📤 Upload versioned package.json and lock file
         uses: actions/upload-artifact@v4
@@ -122,7 +118,7 @@ jobs:
 
       - name: 📌 Commit and push updated version and tag
         env:
-          VERSION: ${{ env.VERSION  }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -134,8 +130,8 @@ jobs:
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION  }}
-          name: v${{ env.VERSION  }}
+          tag_name: v${{ needs.version.outputs.version }}
+          name: v${{ needs.version.outputs.version }}
           files: |
             textwrench-hotkeys.exe
             textwrench-hotkeys-macos
