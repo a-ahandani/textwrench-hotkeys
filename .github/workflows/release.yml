@@ -96,8 +96,10 @@ jobs:
 
       - name: 📁 Prepare dist folder for npm
         run: |
+          ls -la artifacts
           mkdir -p dist
           find artifacts -type f -name 'textwrench-hotkeys*' -exec cp {} dist/ \;
+          ls -la dist
 
       - name: 📦 Publish GitHub Release
         uses: softprops/action-gh-release@v1
