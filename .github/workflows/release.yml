@@ -101,17 +101,6 @@ jobs:
           find artifacts -type f -name 'textwrench-hotkeys*' -exec cp {} dist/ \;
           ls -la dist
 
-      - name: 📦 Publish GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ needs.version.outputs.version }}
-          name: v${{ needs.version.outputs.version }}
-          files: |
-            dist/textwrench-hotkeys.exe
-            dist/textwrench-hotkeys-macos
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: 📥 Restore versioned package.json
         uses: actions/download-artifact@v4
         with:
@@ -137,3 +126,14 @@ jobs:
           git commit -m "chore: release v${{ needs.version.outputs.version }}"
           git tag v${{ needs.version.outputs.version }}
           git push origin main --follow-tags
+          
+      - name: 📦 Publish GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.version.outputs.version }}
+          name: v${{ needs.version.outputs.version }}
+          files: |
+            dist/textwrench-hotkeys.exe
+            dist/textwrench-hotkeys-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
