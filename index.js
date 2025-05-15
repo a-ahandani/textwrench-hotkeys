@@ -1,5 +1,5 @@
-const os = require('os');
 const path = require('path');
+const os = require('os');
 
 function getBinaryPath() {
     const platform = os.platform();
@@ -12,13 +12,11 @@ function getBinaryPath() {
             return path.join(__dirname, 'textwrench-hotkeys-macos');
         }
     } else {
-        if (platform === 'darwin') {
-            // HARDCODE full absolute path for testing
-            return '/Users/ahmad/Dev/electron/textwrench-app/dist/mac-arm64/Textwrench.app/Contents/Resources/textwrench-hotkeys-macos';
-        }
-
+        const resourcesPath = process.resourcesPath;
         if (platform === 'win32') {
-            return 'C:\\Path\\To\\Binary\\textwrench-hotkeys.exe'; // adjust as needed
+            return path.join(resourcesPath, 'textwrench-hotkeys.exe');
+        } else if (platform === 'darwin') {
+            return path.join(resourcesPath, 'textwrench-hotkeys-macos');
         }
     }
 
@@ -26,4 +24,3 @@ function getBinaryPath() {
 }
 
 module.exports = { getBinaryPath };
-
