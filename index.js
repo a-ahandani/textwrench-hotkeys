@@ -3,9 +3,9 @@ const os = require('os');
 
 function getBinaryPath() {
     const platform = os.platform();
-    const isDev = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron[\\/]/.test(process.execPath);
+    const isDev = process.env.NODE_ENV === 'development';
 
-    if (false) {
+    if (isDev) {
         if (platform === 'win32') {
             return path.join(__dirname, 'textwrench-hotkeys.exe');
         } else if (platform === 'darwin') {
