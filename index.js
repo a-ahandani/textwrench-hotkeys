@@ -13,8 +13,9 @@ function getBinaryPath() {
             return path.join(__dirname, 'textwrench-hotkeys-macos');
         }
     } else {
-        // In production: use unpacked path
+        // In production: ensure binary is outside app.asar
         const resourcesPath = process.resourcesPath;
+
         if (platform === 'win32') {
             return path.join(resourcesPath, 'textwrench-hotkeys.exe');
         } else if (platform === 'darwin') {
