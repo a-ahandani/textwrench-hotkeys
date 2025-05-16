@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"golang.design/x/hotkey"
 	"golang.design/x/hotkey/mainthread"
@@ -11,6 +12,13 @@ import (
 
 type Modifier = hotkey.Modifier
 type Key = hotkey.Key
+
+var (
+	globalHotkeyMu    sync.Mutex
+	isRunning         bool
+	lastExecutionTime time.Time
+	globalCooldown    = 500 * time.Millisecond
+)
 
 const (
 	KeyA = hotkey.KeyA
@@ -80,13 +88,32 @@ func (m *Manager) RegisterHotkey(ctx context.Context, id string, mods []Modifier
 	}
 
 	hkCtx, cancel := context.WithCancel(ctx)
+
 	go func() {
 		for {
 			select {
 			case <-hkCtx.Done():
 				return
 			case <-hk.Keydown():
+				now := time.Now()
+
+				globalHotkeyMu.Lock()
+				if isRunning || now.Sub(lastExecutionTime) < globalCooldown {
+					globalHotkeyMu.Unlock()
+					fmt.Printf("Skipping %s: still running or in cooldown\n", id)
+					continue
+				}
+
+				isRunning = true
+				globalHotkeyMu.Unlock()
+
+				fmt.Println("Triggering action for ID:", id)
 				cb()
+
+				globalHotkeyMu.Lock()
+				isRunning = false
+				lastExecutionTime = time.Now()
+				globalHotkeyMu.Unlock()
 			}
 		}
 	}()
