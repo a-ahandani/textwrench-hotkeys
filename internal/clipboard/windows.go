@@ -3,44 +3,50 @@
 package clipboard
 
 import (
+	"bytes"
+	"os/exec"
+	"strings"
 	"time"
-
-	"github.com/atotto/clipboard"
-	"github.com/micmonay/keybd_event"
 )
 
+func sendCtrlKey(key string) error {
+	// Simulate Ctrl+C or Ctrl+V using PowerShell + Windows Script Host
+	script := `
+		Add-Type -AssemblyName System.Windows.Forms
+		[System.Windows.Forms.SendKeys]::SendWait('^` + key + `')
+	`
+	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
+	return cmd.Run()
+}
+
 func readSelectedText() (string, error) {
-	if err := sendCopy(); err != nil {
+	// Simulate Ctrl+C
+	if err := sendCtrlKey("c"); err != nil {
 		return "", err
 	}
 	time.Sleep(100 * time.Millisecond)
-	return clipboard.ReadAll()
+
+	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", "Get-Clipboard")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return strings.TrimRight(out.String(), "\r\n"), nil
 }
 
 func writeText(text string) error {
-	if err := clipboard.WriteAll(text); err != nil {
+	// Set clipboard content
+	script := `Set-Clipboard -Value @"
+` + text + `
+"@`
+	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
+	if err := cmd.Run(); err != nil {
 		return err
 	}
+
 	time.Sleep(100 * time.Millisecond)
-	return sendPaste()
-}
 
-func sendCopy() error {
-	kb, err := keybd_event.NewKeyBonding()
-	if err != nil {
-		return err
-	}
-	kb.HasCTRL(true)
-	kb.SetKeys(keybd_event.VK_C)
-	return kb.Launching()
-}
-
-func sendPaste() error {
-	kb, err := keybd_event.NewKeyBonding()
-	if err != nil {
-		return err
-	}
-	kb.HasCTRL(true)
-	kb.SetKeys(keybd_event.VK_V)
-	return kb.Launching()
+	// Simulate Ctrl+V
+	return sendCtrlKey("v")
 }
