@@ -54,6 +54,7 @@ func FocusPasteText(text string) error {
 		return fmt.Errorf("failed to write to clipboard: %w", err)
 	}
 	time.Sleep(100 * time.Millisecond)
-
-	return switchToNextApp()
+	switchToNextApp()
+	time.Sleep(100 * time.Millisecond)
+	return WriteText(text)
 }

@@ -32,8 +32,6 @@ func switchToNextApp() error {
 	cmd := exec.Command("osascript", "-e", `
 		tell application "System Events"
 			keystroke tab using command down
-			delay 0.3
-			keystroke "v" using command down
 		end tell`)
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
