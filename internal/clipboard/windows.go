@@ -50,9 +50,6 @@ public class Keyboard {
 "@;
 
 [Keyboard]::SendAltTab();
-Start-Sleep -Milliseconds 400;
-Add-Type -AssemblyName System.Windows.Forms;
-[System.Windows.Forms.SendKeys]::SendWait('^v');
 	`)
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
