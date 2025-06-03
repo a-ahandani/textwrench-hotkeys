@@ -65,13 +65,14 @@ func run() {
 
 		case strings.HasPrefix(message, "PASTE|"):
 			content := strings.TrimPrefix(message, "PASTE|")
-			if err := clipboard.PasteText(content); err != nil {
+
+			if err := clipboard.WriteText(content); err != nil {
 				fmt.Printf("Failed to paste text: %v\n", err)
 			}
 
 		default:
 			// Backward-compatible fallback
-			if err := clipboard.PasteText(message); err != nil {
+			if err := clipboard.WriteText(message); err != nil {
 				fmt.Printf("Failed to paste text: %v\n", err)
 			}
 		}
