@@ -46,7 +46,7 @@ func run() {
 		{ID: "explainSelectedText", Key: "E", Modifiers: []string{"ctrl", "shift"}},
 		{ID: "selectPrompt", Key: "J", Modifiers: []string{"ctrl", "shift"}},
 	}
-
+	manager.UnregisterAll()
 	registerHotkeys(ctx, manager, comm, defaultHotkeys)
 
 	handler := func(message string) {
@@ -72,9 +72,7 @@ func run() {
 
 		default:
 			// Backward-compatible fallback
-			if err := clipboard.WriteText(message); err != nil {
-				fmt.Printf("Failed to paste text: %v\n", err)
-			}
+			fmt.Printf("Ignoring unrecognized comm message: %q\n", message)
 		}
 	}
 
@@ -118,7 +116,7 @@ func handleConfigMessage(message string, comm comms.Communicator, manager *hotke
 		return
 	}
 	fmt.Println("Registering hotkey:", message)
-
+	manager.UnregisterAll()
 	registerHotkeys(ctx, manager, comm, configs)
 }
 
