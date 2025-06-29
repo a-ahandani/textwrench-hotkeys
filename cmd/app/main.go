@@ -26,21 +26,27 @@ func main() {
 }
 
 func run() {
+	// Create cancellable context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Graceful shutdown handling
+	// Instantiate communicator and hotkey manager
+	comm := comms.NewCommunicator()
+	manager := hotkey.NewManager()
+
+	// Graceful shutdown handling: on SIGINT/SIGTERM, close comm and cancel context
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigs
 		fmt.Println("\nShutting down...")
+		if err := comm.Close(); err != nil {
+			fmt.Printf("Failed to close communicator: %v\n", err)
+		}
 		cancel()
 	}()
 
-	comm := comms.NewCommunicator()
-	manager := hotkey.NewManager()
-
+	// Register default hotkeys
 	defaultHotkeys := []ShortcutConfig{
 		{ID: "fixSelectedText", Key: "C", Modifiers: []string{"ctrl", "shift"}},
 		{ID: "explainSelectedText", Key: "E", Modifiers: []string{"ctrl", "shift"}},
@@ -49,6 +55,7 @@ func run() {
 	manager.UnregisterAll()
 	registerHotkeys(ctx, manager, comm, defaultHotkeys)
 
+	// Message handler from the front-end
 	handler := func(message string) {
 		if strings.HasPrefix(message, "SHORTCUT_CONFIG|") {
 			handleConfigMessage(message, comm, manager, ctx)
@@ -71,11 +78,12 @@ func run() {
 			}
 
 		default:
-			// Backward-compatible fallback
+			// Backward‐compatible fallback
 			fmt.Printf("Ignoring unrecognized comm message: %q\n", message)
 		}
 	}
 
+	// Start the IPC listener
 	go func() {
 		if err := comm.Start(ctx, handler); err != nil {
 			log.Fatalf("Failed to start communicator: %v", err)
@@ -84,6 +92,11 @@ func run() {
 
 	fmt.Println("Hotkey app running. Waiting for configuration...")
 	<-ctx.Done()
+
+	// Final cleanup (in case signal handler didn't already)
+	if err := comm.Close(); err != nil {
+		fmt.Printf("Failed to close communicator: %v\n", err)
+	}
 	manager.UnregisterAll()
 	fmt.Println("Exited neatly")
 }
@@ -115,7 +128,7 @@ func handleConfigMessage(message string, comm comms.Communicator, manager *hotke
 		fmt.Printf("Invalid config received: %v\n", err)
 		return
 	}
-	fmt.Println("Registering hotkey:", message)
+	fmt.Println("Registering new shortcuts configuration")
 	manager.UnregisterAll()
 	registerHotkeys(ctx, manager, comm, configs)
 }
